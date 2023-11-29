@@ -53,5 +53,8 @@ public final class ConfigFromFile {
                 view.displayError(e.getMessage());
             }
         }
+
+        // TODO: build configuration and check if it's consistent
+
     }
 }
