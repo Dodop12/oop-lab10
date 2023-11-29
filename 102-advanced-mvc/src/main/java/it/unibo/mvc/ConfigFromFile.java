@@ -23,38 +23,50 @@ public final class ConfigFromFile {
         try {
             final List<String> lines = Files.readAllLines(Path.of(FILE_PATH), StandardCharsets.UTF_8);
 
-            for (String string : lines) {
-                var tokenizer = new StringTokenizer(string); // Splits the lines into tokens (words separated by a space
-                                                             // as default)
-                String current = "";
-                if (tokenizer.hasMoreTokens()) {
-                    current = tokenizer.nextToken();
-                }
+            for (String line : lines) {
+                var tokenizer = new StringTokenizer(line); // Splits the lines into tokens (words separated by a space
+                                                           // as default)
+                int lineNumber = 1; // Used by the error log
 
                 // Assuming the attribute (min, max, attempts) is followed by the corrisponding
                 // numeric value
-                switch (current.toLowerCase()) {
-                    case MIN:
-                        confBuilder.setMin(Integer.parseInt(current));
-                        break;
-                    case MAX:
-                        confBuilder.setMax(Integer.parseInt(current));
-                        break;
-                    case ATTEMPTS:
-                        confBuilder.setAttempts(Integer.parseInt(current));
-                        break;
-                    default:
-                        break;
+                if (tokenizer.countTokens() == 2) {
+                    String attribute = tokenizer.nextToken().toLowerCase();
+                    int value = Integer.parseInt(tokenizer.nextToken());
+
+                    switch (attribute) {
+                        case MIN:
+                            confBuilder.setMin(value);
+                            break;
+                        case MAX:
+                            confBuilder.setMax(value);
+                            break;
+                        case ATTEMPTS:
+                            confBuilder.setAttempts(value);
+                            break;
+                        default:
+                            displayError("Configuration file format error: invalid attribute (line " + lineNumber + ")",
+                                    views);
+                            break;
+                    }
+                } else {
+                    displayError("Configuration file format error: lines cannot contain more than 2 words", views);
+                    break;
                 }
+
+                lineNumber++;
             }
         } catch (final IOException | NumberFormatException e) {
             e.printStackTrace();
-            for (final var view : views) {
-                view.displayError(e.getMessage());
-            }
+            displayError(e.getMessage(), views);
         }
 
         // TODO: build configuration and check if it's consistent
+    }
 
+    private static void displayError(final String error, final DrawNumberView... views) {
+        for (final var view : views) {
+            view.displayError(error);
+        }
     }
 }
