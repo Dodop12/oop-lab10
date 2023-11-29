@@ -18,21 +18,21 @@ public final class ConfigFromFile {
     private static final String MAX = "maximum";
     private static final String ATTEMPTS = "attempts";
 
+    private final Configuration.Builder confBuilder;
+
     public ConfigFromFile(final DrawNumberView... views) {
-        final var confBuilder = new Configuration.Builder();
+        confBuilder = new Configuration.Builder();
         try {
             final List<String> lines = Files.readAllLines(Path.of(FILE_PATH), StandardCharsets.UTF_8);
 
-            for (String line : lines) {
-                var tokenizer = new StringTokenizer(line); // Splits the lines into tokens (words separated by a space
-                                                           // as default)
+            for (final String line : lines) {
+                final var tokenizer = new StringTokenizer(line); // Splits the lines into tokens (words separated by a
+                                                                 // space by default)
                 int lineNumber = 1; // Used by the error log
 
-                // Assuming the attribute (min, max, attempts) is followed by the corrisponding
-                // numeric value
                 if (tokenizer.countTokens() == 2) {
-                    String attribute = tokenizer.nextToken().toLowerCase();
-                    int value = Integer.parseInt(tokenizer.nextToken());
+                    final String attribute = tokenizer.nextToken().toLowerCase();
+                    final int value = Integer.parseInt(tokenizer.nextToken());
 
                     switch (attribute) {
                         case MIN:
@@ -50,7 +50,8 @@ public final class ConfigFromFile {
                             break;
                     }
                 } else {
-                    displayError("Configuration file format error: lines cannot contain more than 2 words", views);
+                    displayError("Configuration file format error: lines cannot contain more than 2 words (line "
+                            + lineNumber + ")", views);
                     break;
                 }
 
@@ -60,8 +61,10 @@ public final class ConfigFromFile {
             e.printStackTrace();
             displayError(e.getMessage(), views);
         }
+    }
 
-        // TODO: build configuration and check if it's consistent
+    public Configuration.Builder getConfBuilder() {
+        return confBuilder;
     }
 
     private static void displayError(final String error, final DrawNumberView... views) {
