@@ -3,6 +3,7 @@
 .gradle/
 .vscode/
 *.iml
+log.txt
 
 # output folders
 bin/
