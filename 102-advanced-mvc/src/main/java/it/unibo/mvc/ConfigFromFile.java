@@ -30,8 +30,7 @@ public final class ConfigFromFile {
         confBuilder = new Configuration.Builder();
         try {
             final Path filePath = Path.of(ClassLoader.getSystemResource(FILE_NAME).toURI());
-            final List<String> lines = Files.readAllLines(filePath,
-                    StandardCharsets.UTF_8);
+            final List<String> lines = Files.readAllLines(filePath, StandardCharsets.UTF_8);
 
             for (final String line : lines) {
                 // Splits the lines into tokens (words separated by a colon and a space by
