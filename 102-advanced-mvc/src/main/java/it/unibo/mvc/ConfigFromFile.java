@@ -36,8 +36,8 @@ public final class ConfigFromFile {
                 final var tokenizer = new StringTokenizer(line, ": ");
                 int lineNumber = 1; // Used by the error log
 
-                // Each line of the file must contain 2 words: attribute: value (colon and space
-                // between the two are needed)
+                // Each line of the file must have the format "attribute: value" (colon and
+                // space between the two are needed)
                 if (tokenizer.countTokens() == 2) {
                     // First word of the line; ignoring case
                     final String attribute = tokenizer.nextToken().toLowerCase();
@@ -45,34 +45,30 @@ public final class ConfigFromFile {
                     final int value = Integer.parseInt(tokenizer.nextToken());
 
                     switch (attribute) {
-                        case MIN:
-                            confBuilder.setMin(value);
-                            break;
-                        case MAX:
-                            confBuilder.setMax(value);
-                            break;
-                        case ATTEMPTS:
-                            confBuilder.setAttempts(value);
-                            break;
-                        default:
-                            DrawNumberApp.displayError(
-                                    "Configuration file format error: invalid attribute (line " + lineNumber + ")",
-                                    views);
-                            break;
+                        case MIN -> confBuilder.setMin(value);
+                        case MAX -> confBuilder.setMax(value);
+                        case ATTEMPTS -> confBuilder.setAttempts(value);
+                        default -> DrawNumberApp.displayError(
+                                "Configuration file format error: invalid attribute (line " + lineNumber + ")", views);
                     }
                 } else {
                     DrawNumberApp.displayError(
-                            "Configuration file format error: lines cannot contain more than 2 words (line "
-                                    + lineNumber + ")",
+                            "Configuration file format error: lines must contain 2 words (line " + lineNumber + ")",
                             views);
-                    break;
                 }
 
                 lineNumber++;
             }
         } catch (final IOException | NumberFormatException e) {
             e.printStackTrace();
-            DrawNumberApp.displayError(e.getMessage(), views);
+
+            String message = e.getMessage();
+            if (e instanceof IOException) {
+                message = "Cannot find the file " + message;
+            } else {
+                message = "Invalid configuration file format. " + message;
+            }
+            DrawNumberApp.displayError(message, views);
         }
     }
 
