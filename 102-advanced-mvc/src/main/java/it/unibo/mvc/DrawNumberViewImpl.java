@@ -48,7 +48,7 @@ public final class DrawNumberViewImpl implements DrawNumberView {
             public void actionPerformed(final ActionEvent e) {
                 try {
                     observer.newAttempt(Integer.parseInt(tNumber.getText()));
-                } catch (NumberFormatException exception) {
+                } catch (final NumberFormatException exception) {
                     JOptionPane.showMessageDialog(frame, "An integer please..");
                 }
             }
@@ -120,7 +120,7 @@ public final class DrawNumberViewImpl implements DrawNumberView {
     }
 
     @Override
-    public void displayError(String message) {
+    public void displayError(final String message) {
         JOptionPane.showMessageDialog(frame, message, "Error", JOptionPane.ERROR_MESSAGE);
     }
 }

@@ -22,6 +22,9 @@ public final class ConfigFromFile {
 
     private final Configuration.Builder confBuilder;
 
+    /**
+     * @param views
+     */
     public ConfigFromFile(final DrawNumberView... views) {
         confBuilder = new Configuration.Builder();
         try {
