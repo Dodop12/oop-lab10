@@ -45,12 +45,12 @@ public final class ConfigFromFile {
                         case MIN -> confBuilder.setMin(value);
                         case MAX -> confBuilder.setMax(value);
                         case ATTEMPTS -> confBuilder.setAttempts(value);
-                        default -> DrawNumberApp.displayError(
+                        default -> DrawNumberApp.displayErrorAll(
                                 "Configuration file format error: invalid attribute (line " + lineNumber + ")", views);
                     }
                 } else {
                     DrawNumberApp
-                            .displayError("Configuration file format error: each line must contain two words (line "
+                            .displayErrorAll("Configuration file format error: each line must contain two words (line "
                                     + lineNumber + ")", views);
                 }
 
@@ -65,7 +65,7 @@ public final class ConfigFromFile {
             } else {
                 message = "Invalid configuration file format. " + message;
             }
-            DrawNumberApp.displayError(message, views);
+            DrawNumberApp.displayErrorAll(message, views);
         }
     }
 

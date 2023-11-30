@@ -32,7 +32,7 @@ public final class DrawNumberApp implements DrawNumberViewObserver {
         final Configuration configuration = new ConfigFromFile(views).getConfBuilder().build();
         if (!configuration.isConsistent()) {
             this.model = new DrawNumberImpl(new Configuration.Builder().build());
-            displayError("Invalid configuration (min: " + configuration.getMin() + ", max: " + configuration.getMax()
+            displayErrorAll("Invalid configuration (min: " + configuration.getMin() + ", max: " + configuration.getMax()
                     + ", attempts: " + configuration.getAttempts() + "). Default value have been set.", views);
         } else {
             this.model = new DrawNumberImpl(configuration);
@@ -69,7 +69,7 @@ public final class DrawNumberApp implements DrawNumberViewObserver {
         System.exit(0);
     }
 
-    public static void displayError(final String error, final DrawNumberView... views) {
+    public static void displayErrorAll(final String error, final DrawNumberView... views) {
         for (final var view : views) {
             view.displayError(error);
         }
