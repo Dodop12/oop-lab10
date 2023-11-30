@@ -1,7 +1,7 @@
 package it.unibo.mvc;
 
-import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,9 +13,10 @@ import java.util.StringTokenizer;
  * Reads the application settings from the configuration file provided.
  */
 public final class ConfigFromFile {
-    private static final String SEP = File.separator;
-    private static final String FILE_PATH = System.getProperty("user.dir") + SEP + "102-advanced-mvc" + SEP + "src"
-            + SEP + "main" + SEP + "resources" + SEP + "config.yml";
+
+    private static final String FILE_NAME = "config.yml";
+    private static final String DEFAULTVALUES_ERROR = "Default values have been set.";
+
     private static final String MIN = "minimum";
     private static final String MAX = "maximum";
     private static final String ATTEMPTS = "attempts";
@@ -28,7 +29,9 @@ public final class ConfigFromFile {
     public ConfigFromFile(final DrawNumberView... views) {
         confBuilder = new Configuration.Builder();
         try {
-            final List<String> lines = Files.readAllLines(Path.of(FILE_PATH), StandardCharsets.UTF_8);
+            final Path filePath = Path.of(ClassLoader.getSystemResource(FILE_NAME).toURI());
+            final List<String> lines = Files.readAllLines(filePath,
+                    StandardCharsets.UTF_8);
 
             for (final String line : lines) {
                 // Splits the lines into tokens (words separated by a colon and a space by
@@ -53,25 +56,37 @@ public final class ConfigFromFile {
                     }
                 } else {
                     DrawNumberApp
-                            .displayErrorAll("Configuration file format error: each line must contain two words (line "
-                                    + lineNumber + ")", views);
+                            .displayErrorAll(
+                                    "Configuration file format error: each line must contain exactly two words (line "
+                                            + lineNumber + ")",
+                                    views);
                 }
 
                 lineNumber++;
             }
-        } catch (final IOException | NumberFormatException e) {
+        } catch (final NullPointerException e) {
             e.printStackTrace();
-
-            String message = e.getMessage();
-            if (e instanceof IOException) {
-                message = "Cannot find the file " + message;
-            } else {
-                message = "Invalid configuration file format. " + message;
-            }
-            DrawNumberApp.displayErrorAll(message, views);
+            DrawNumberApp.displayErrorAll("Cannot find the file '" + FILE_NAME + "'. " + DEFAULTVALUES_ERROR,
+                    views);
+        } catch (final IOException e) {
+            e.printStackTrace();
+            DrawNumberApp.displayErrorAll("Cannot read the file '" + FILE_NAME + "'. " + DEFAULTVALUES_ERROR,
+                    views);
+        } catch (final NumberFormatException e) {
+            e.printStackTrace();
+            DrawNumberApp.displayErrorAll(
+                    "Invalid configuration file format. " + e.getMessage() + ". " + DEFAULTVALUES_ERROR, views);
+        } catch (final URISyntaxException e) {
+            e.printStackTrace();
+            DrawNumberApp.displayErrorAll(
+                    "Cannot read the file path. " + e.getMessage() + ". " + DEFAULTVALUES_ERROR,
+                    views);
         }
     }
 
+    /**
+     * @return the configuration builder
+     */
     public Configuration.Builder getConfBuilder() {
         return confBuilder;
     }
