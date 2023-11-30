@@ -13,7 +13,8 @@ import java.util.StringTokenizer;
  */
 public final class ConfigFromFile {
     private static final String SEP = File.separator;
-    private static final String FILE_PATH = "src" + SEP + "main" + SEP + "resources" + SEP + "config.yml";
+    private static final String FILE_PATH = System.getProperty("user.dir") + SEP + "102-advanced-mvc" + SEP + "src"
+            + SEP + "main" + SEP + "resources" + SEP + "config.yml";
     private static final String MIN = "minimum";
     private static final String MAX = "maximum";
     private static final String ATTEMPTS = "attempts";
@@ -45,13 +46,16 @@ public final class ConfigFromFile {
                             confBuilder.setAttempts(value);
                             break;
                         default:
-                            displayError("Configuration file format error: invalid attribute (line " + lineNumber + ")",
+                            DrawNumberApp.displayError(
+                                    "Configuration file format error: invalid attribute (line " + lineNumber + ")",
                                     views);
                             break;
                     }
                 } else {
-                    displayError("Configuration file format error: lines cannot contain more than 2 words (line "
-                            + lineNumber + ")", views);
+                    DrawNumberApp.displayError(
+                            "Configuration file format error: lines cannot contain more than 2 words (line "
+                                    + lineNumber + ")",
+                            views);
                     break;
                 }
 
@@ -59,17 +63,11 @@ public final class ConfigFromFile {
             }
         } catch (final IOException | NumberFormatException e) {
             e.printStackTrace();
-            displayError(e.getMessage(), views);
+            DrawNumberApp.displayError(e.getMessage(), views);
         }
     }
 
     public Configuration.Builder getConfBuilder() {
         return confBuilder;
-    }
-
-    private static void displayError(final String error, final DrawNumberView... views) {
-        for (final var view : views) {
-            view.displayError(error);
-        }
     }
 }

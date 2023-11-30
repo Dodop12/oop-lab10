@@ -1,6 +1,7 @@
 package it.unibo.mvc;
 
 import java.io.FileNotFoundException;
+import java.io.ObjectInputFilter.Config;
 import java.util.Arrays;
 import java.util.List;
 
@@ -30,9 +31,12 @@ public final class DrawNumberApp implements DrawNumberViewObserver {
 
         final Configuration configuration = new ConfigFromFile(views).getConfBuilder().build();
         if (!configuration.isConsistent()) {
-
+            this.model = new DrawNumberImpl(new Configuration.Builder().build());
+            displayError("Invalid configuration (min: " + configuration.getMin() + ", max: " + configuration.getMax()
+                    + ", attempts: " + configuration.getAttempts() + "). Default value have been set.", views);
+        } else {
+            this.model = new DrawNumberImpl(configuration);
         }
-        this.model = new DrawNumberImpl(MIN, MAX, ATTEMPTS);
     }
 
     @Override
@@ -63,6 +67,12 @@ public final class DrawNumberApp implements DrawNumberViewObserver {
          * until the last thread terminates.
          */
         System.exit(0);
+    }
+
+    public static void displayError(final String error, final DrawNumberView... views) {
+        for (final var view : views) {
+            view.displayError(error);
+        }
     }
 
     /**
