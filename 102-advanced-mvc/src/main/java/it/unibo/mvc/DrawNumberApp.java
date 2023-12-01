@@ -66,10 +66,10 @@ public final class DrawNumberApp implements DrawNumberViewObserver {
     }
 
     /**
-     * Shows the error in all the views passed.
+     * Shows the error in all the specified views.
      * 
-     * @param error message to show
-     * @param views the views to attach
+     * @param error the message to show
+     * @param views the graphical interfaces where the error has to be displayed
      */
     public static void displayErrorAll(final String error, final DrawNumberView... views) {
         for (final var view : views) {
