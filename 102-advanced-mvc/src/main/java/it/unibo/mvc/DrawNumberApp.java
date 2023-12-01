@@ -69,7 +69,7 @@ public final class DrawNumberApp implements DrawNumberViewObserver {
      * Shows the error in all the views passed.
      * 
      * @param error message to show
-     * @param views
+     * @param views the view to attach
      */
     public static void displayErrorAll(final String error, final DrawNumberView... views) {
         for (final var view : views) {
@@ -80,7 +80,8 @@ public final class DrawNumberApp implements DrawNumberViewObserver {
     /**
      * @param args
      *             ignored
-     * @throws FileNotFoundException
+     * @throws FileNotFoundException if the specified file cannot be neither opened
+     *                               nor created
      */
     public static void main(final String... args) throws FileNotFoundException {
         new DrawNumberApp(new DrawNumberViewImpl(), new DrawNumberViewImpl(), new PrintStreamView(System.out),

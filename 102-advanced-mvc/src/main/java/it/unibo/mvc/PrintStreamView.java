@@ -28,7 +28,7 @@ public final class PrintStreamView implements DrawNumberView {
      * Builds a {@link PrintStreamView} that writes on file, given a path.
      * 
      * @param path a file path
-     * @throws FileNotFoundException
+     * @throws FileNotFoundException if the file cannot be created
      */
     public PrintStreamView(final String path) throws FileNotFoundException {
         out = new PrintStream(new FileOutputStream(new File(path)));
