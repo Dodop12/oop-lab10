@@ -63,7 +63,8 @@ public final class ConfigFromFile {
     }
 
     /**
-     * Reads the attribute of the given line and sets the corrisponding value
+     * Reads the attribute of the given line of the file and sets the corrisponding
+     * value
      * 
      * @param lineNumber number of current line
      * @param line       line of the file to read
