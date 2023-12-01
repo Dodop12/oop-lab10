@@ -2,6 +2,7 @@ package it.unibo.mvc;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -29,7 +30,7 @@ public final class ConfigFromFile {
     private final Configuration.Builder confBuilder;
 
     /**
-     * @param views the views to attach
+     * @param views the graphical interfaces of the app
      */
     public ConfigFromFile(final DrawNumberView... views) {
         confBuilder = new Configuration.Builder();
@@ -38,41 +39,53 @@ public final class ConfigFromFile {
         try {
             // Searches for the specified file in the class path and gets its URL
             final var fileURL = ClassLoader.getSystemResource(FILE_NAME);
-
-            if (Objects.isNull(fileURL)) { // File not found
-                DrawNumberApp.displayErrorAll(String.format(FILE_NOT_FOUND_ERROR, FILE_NAME) + " " + DEFAULT_VALUES_SET,
-                        views);
+            if (Objects.isNull(fileURL)) {
+                displayFileNotFoundError(FILE_NAME, views);
             } else {
-                final Path filePath = Path.of(fileURL.toURI());
-
-                final List<String> lines = Files.readAllLines(filePath, StandardCharsets.UTF_8);
-                for (final String line : lines) {
-                    readLine(lineNumber, line, views);
-                    lineNumber++;
-                }
+                readFile(fileURL, lineNumber, views);
             }
-        } catch (final IOException e) { // File cannot be read
-            DrawNumberApp.displayErrorAll(String.format(FILE_READ_ERROR, FILE_NAME) + " " + DEFAULT_VALUES_SET, views);
+        } catch (final URISyntaxException e) {
+            displayPathError(e.getMessage(), views);
+        } catch (final IOException e) {
+            displayReadFileError(FILE_NAME, views);
         } catch (final NumberFormatException e) {
-            DrawNumberApp.displayErrorAll(
-                    String.format(FILE_FORMAT_ERROR, e.getMessage(), lineNumber) + " " + DEFAULT_VALUES_SET, views);
-        } catch (final URISyntaxException e) { // Error while reading the file path
-            DrawNumberApp.displayErrorAll(String.format(FILE_PATH_ERROR, e.getMessage()) + " " + DEFAULT_VALUES_SET,
-                    views);
+            displayFormatError(e.getMessage(), lineNumber, views);
+        }
+    }
+
+    /**
+     * Reads the given file to extract the values.
+     * 
+     * @param fileURL    the URL of the file to read
+     * @param lineNumber the line counter of the file (used for error logs)
+     * @param views      the graphical interfaces of the app
+     * @throws IOException           if the file cannot be read
+     * @throws NumberFormatException if the format of the value fields are incorrect
+     * @throws URISyntaxException    if the format of the file URL is incorrect and
+     *                               cannot be converted to an URI
+     */
+    private void readFile(final URL fileURL, int lineNumber, final DrawNumberView... views)
+            throws URISyntaxException, IOException, NumberFormatException {
+        final Path filePath = Path.of(fileURL.toURI());
+
+        final List<String> lines = Files.readAllLines(filePath, StandardCharsets.UTF_8);
+        for (final String line : lines) {
+            readLine(line, lineNumber, views);
+            lineNumber++;
         }
     }
 
     /**
      * Reads the attribute of the given line of the file and sets the corrisponding
-     * value
+     * value.
      * 
-     * @param lineNumber number of current line
-     * @param line       line of the file to read
-     * @param views      views to attach
+     * @param line       the line of the file to read
+     * @param lineNumber the number of current line
+     * @param views      the graphical interfaces of the app
      * 
      * @throws NumberFormatException if the value field does not contain a number
      */
-    private void readLine(int lineNumber, final String line, final DrawNumberView... views)
+    private void readLine(final String line, int lineNumber, final DrawNumberView... views)
             throws NumberFormatException {
         // Splits the lines into tokens (words separated by a colon and a space by
         // default)
@@ -90,13 +103,60 @@ public final class ConfigFromFile {
                 case MIN -> confBuilder.setMin(value);
                 case MAX -> confBuilder.setMax(value);
                 case ATTEMPTS -> confBuilder.setAttempts(value);
-                default -> DrawNumberApp.displayErrorAll(
-                        String.format(FILE_FORMAT_ERROR, "invalid attribute", lineNumber), views);
+                default -> displayFormatError("invalid attribute", lineNumber, views);
             }
         } else {
-            DrawNumberApp.displayErrorAll(
-                    String.format(FILE_FORMAT_ERROR, "each line must contain exactly two words", lineNumber), views);
+            displayFormatError("each line must contain exactly two words", lineNumber, views);
         }
+    }
+
+    /**
+     * Shows the error caused by the absence of the given file in the current
+     * classpath.
+     * It also informs the user that as a result default values have been set.
+     * 
+     * @param fileName the name of the specified file
+     * @param views    the graphical interfaces where the error has to be displayed
+     */
+    private void displayFileNotFoundError(final String fileName, final DrawNumberView... views) {
+        DrawNumberApp.displayErrorAll(String.format(FILE_NOT_FOUND_ERROR, fileName) + " " + DEFAULT_VALUES_SET, views);
+    }
+
+    /**
+     * Shows the error occurred while trying to read the URL of the file before
+     * converting it into an URI and then into a path.
+     * It also informs the user that as a result default values have been set.
+     * 
+     * @param cause the details of the cause
+     * @param views the graphical interfaces where the error has to be displayed
+     */
+    private void displayPathError(final String cause, final DrawNumberView... views) {
+        DrawNumberApp.displayErrorAll(String.format(FILE_PATH_ERROR, cause) + " " + DEFAULT_VALUES_SET, views);
+    }
+
+    /**
+     * Shows the error occurred while trying to read the file.
+     * It also informs the user that as a result default values have been set.
+     * 
+     * @param fileName the name of the specified file
+     * @param views    the graphical interfaces where the error has to be displayed
+     */
+    private void displayReadFileError(final String fileName, final DrawNumberView... views) {
+        DrawNumberApp.displayErrorAll(String.format(FILE_READ_ERROR, fileName) + " " + DEFAULT_VALUES_SET, views);
+    }
+
+    /**
+     * Shows the error caused by an invalid format of the file.
+     * It also informs the user that as a result default values have been set.
+     * 
+     * @param cause      the details of the cause
+     * @param lineNumber the number of the line in the file which caused the error
+     * @param views      the graphical interfaces where the error has to be
+     *                   displayed
+     */
+    private void displayFormatError(final String cause, final int lineNumber, final DrawNumberView... views) {
+        DrawNumberApp.displayErrorAll(String.format(FILE_FORMAT_ERROR, cause, lineNumber) + " " + DEFAULT_VALUES_SET,
+                views);
     }
 
     /**
