@@ -28,13 +28,14 @@ public final class ConfigFromFile {
     private static final String FILE_PATH_ERROR = "Cannot read the file path: %s.";
 
     private final Configuration.Builder confBuilder;
+    private int lineNumber; // Used by the error log
 
     /**
      * @param views the graphical interfaces of the app
      */
     public ConfigFromFile(final DrawNumberView... views) {
         confBuilder = new Configuration.Builder();
-        int lineNumber = 1; // Used by the error log
+        this.lineNumber = 1;
 
         try {
             // Searches for the specified file in the class path and gets its URL
@@ -42,36 +43,34 @@ public final class ConfigFromFile {
             if (Objects.isNull(fileURL)) {
                 displayFileNotFoundError(FILE_NAME, views);
             } else {
-                readFile(fileURL, lineNumber, views);
+                readFile(fileURL, views);
             }
         } catch (final URISyntaxException e) {
             displayPathError(e.getMessage(), views);
         } catch (final IOException e) {
             displayReadFileError(FILE_NAME, views);
         } catch (final NumberFormatException e) {
-            displayFormatError(e.getMessage(), lineNumber, views);
+            displayFormatError(e.getMessage(), getLineNumber(), views);
         }
     }
 
     /**
      * Reads the given file to extract the values.
      * 
-     * @param fileURL    the URL of the file to read
-     * @param lineNumber the line counter of the file (used for error logs)
-     * @param views      the graphical interfaces of the app
+     * @param fileURL the URL of the file to read
+     * @param views   the graphical interfaces of the app
      * @throws IOException           if the file cannot be read
      * @throws NumberFormatException if the format of the value fields are incorrect
      * @throws URISyntaxException    if the format of the file URL is incorrect and
      *                               cannot be converted to an URI
      */
-    private void readFile(final URL fileURL, int lineNumber, final DrawNumberView... views)
-            throws URISyntaxException, IOException, NumberFormatException {
+    private void readFile(final URL fileURL, final DrawNumberView... views) throws URISyntaxException, IOException {
         final Path filePath = Path.of(fileURL.toURI());
 
         final List<String> lines = Files.readAllLines(filePath, StandardCharsets.UTF_8);
         for (final String line : lines) {
-            readLine(line, lineNumber, views);
-            lineNumber++;
+            readLine(line, views);
+            setLineNumber(getLineNumber() + 1);
         }
     }
 
@@ -79,14 +78,11 @@ public final class ConfigFromFile {
      * Reads the attribute of the given line of the file and sets the corrisponding
      * value.
      * 
-     * @param line       the line of the file to read
-     * @param lineNumber the number of current line
-     * @param views      the graphical interfaces of the app
-     * 
+     * @param line  the line of the file to read
+     * @param views the graphical interfaces of the app
      * @throws NumberFormatException if the value field does not contain a number
      */
-    private void readLine(final String line, int lineNumber, final DrawNumberView... views)
-            throws NumberFormatException {
+    private void readLine(final String line, final DrawNumberView... views) {
         // Splits the lines into tokens (words separated by a colon and a space by
         // default)
         final var tokenizer = new StringTokenizer(line, ": ");
@@ -103,10 +99,10 @@ public final class ConfigFromFile {
                 case MIN -> confBuilder.setMin(value);
                 case MAX -> confBuilder.setMax(value);
                 case ATTEMPTS -> confBuilder.setAttempts(value);
-                default -> displayFormatError("invalid attribute", lineNumber, views);
+                default -> displayFormatError("invalid attribute", getLineNumber(), views);
             }
         } else {
-            displayFormatError("each line must contain exactly two words", lineNumber, views);
+            displayFormatError("each line must contain exactly two words", getLineNumber(), views);
         }
     }
 
@@ -157,6 +153,17 @@ public final class ConfigFromFile {
     private void displayFormatError(final String cause, final int lineNumber, final DrawNumberView... views) {
         DrawNumberApp.displayErrorAll(String.format(FILE_FORMAT_ERROR, cause, lineNumber) + " " + DEFAULT_VALUES_SET,
                 views);
+    }
+
+    private void setLineNumber(final int lineNumber) {
+        this.lineNumber = lineNumber;
+    }
+
+    /**
+     * @return the number of the last line read
+     */
+    private int getLineNumber() {
+        return lineNumber;
     }
 
     /**
