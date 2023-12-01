@@ -17,7 +17,6 @@ public final class ConfigFromFile {
 
     private static final String FILE_NAME = "config.yml";
     private static final String DEFAULTVALUES_ERROR = "Default values have been set.";
-
     private static final String MIN = "minimum";
     private static final String MAX = "maximum";
     private static final String ATTEMPTS = "attempts";
@@ -30,7 +29,9 @@ public final class ConfigFromFile {
     public ConfigFromFile(final DrawNumberView... views) {
         confBuilder = new Configuration.Builder();
         try {
+            // Searches for the specified file in the class path and gets its URL
             final var fileURL = ClassLoader.getSystemResource(FILE_NAME);
+
             int lineNumber = 1; // Used by the error log
 
             if (Objects.isNull(fileURL)) {
