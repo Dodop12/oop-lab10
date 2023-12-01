@@ -59,10 +59,10 @@ public final class ConfigFromFile {
      * 
      * @param fileURL the URL of the file to read
      * @param views   the graphical interfaces of the app
-     * @throws IOException           if the file cannot be read
-     * @throws NumberFormatException if the format of the value fields are incorrect
      * @throws URISyntaxException    if the format of the file URL is incorrect and
      *                               cannot be converted to an URI
+     * @throws IOException           if the file cannot be read
+     * @throws NumberFormatException if the format of the value fields are incorrect
      */
     private void readFile(final URL fileURL, final DrawNumberView... views) throws URISyntaxException, IOException {
         final Path filePath = Path.of(fileURL.toURI());
@@ -75,8 +75,8 @@ public final class ConfigFromFile {
     }
 
     /**
-     * Reads the attribute of the given line of the file and sets the corrisponding
-     * value.
+     * Reads the attribute of the specified line of the file and sets the
+     * corresponding value.
      * 
      * @param line  the line of the file to read
      * @param views the graphical interfaces of the app
@@ -107,7 +107,7 @@ public final class ConfigFromFile {
     }
 
     /**
-     * Shows the error caused by the absence of the given file in the current
+     * Shows the error caused by the absence of the specified file in the current
      * classpath.
      * It also informs the user that as a result default values have been set.
      * 
