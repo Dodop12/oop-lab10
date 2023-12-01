@@ -16,10 +16,15 @@ import java.util.StringTokenizer;
 public final class ConfigFromFile {
 
     private static final String FILE_NAME = "config.yml";
-    private static final String DEFAULTVALUES_ERROR = "Default values have been set.";
     private static final String MIN = "minimum";
     private static final String MAX = "maximum";
     private static final String ATTEMPTS = "attempts";
+
+    private static final String DEFAULT_VALUES_SET = "Default values have been set.";
+    private static final String FILE_NOT_FOUND_ERROR = "Cannot find the file '%s'.";
+    private static final String FILE_READ_ERROR = "Cannot read the file '%s'.";
+    private static final String FILE_FORMAT_ERROR = "Configuration file format error: %s (line %d).";
+    private static final String FILE_PATH_ERROR = "Cannot read the file path: %s.";
 
     private final Configuration.Builder confBuilder;
 
@@ -34,56 +39,62 @@ public final class ConfigFromFile {
             // Searches for the specified file in the class path and gets its URL
             final var fileURL = ClassLoader.getSystemResource(FILE_NAME);
 
-            if (Objects.isNull(fileURL)) {
-                DrawNumberApp.displayErrorAll("Cannot find the file '" + FILE_NAME + "'. " + DEFAULTVALUES_ERROR,
+            if (Objects.isNull(fileURL)) { // File not found
+                DrawNumberApp.displayErrorAll(String.format(FILE_NOT_FOUND_ERROR, FILE_NAME) + " " + DEFAULT_VALUES_SET,
                         views);
             } else {
                 final Path filePath = Path.of(fileURL.toURI());
                 final List<String> lines = Files.readAllLines(filePath, StandardCharsets.UTF_8);
 
                 for (final String line : lines) {
-                    // Splits the lines into tokens (words separated by a colon and a space by
-                    // default)
-                    final var tokenizer = new StringTokenizer(line, ": ");
-
-                    // Each line of the file must have the format 'attribute: value' (colon and
-                    // space between the two are needed)
-                    if (tokenizer.countTokens() == 2) {
-                        // First word of the line; ignoring case
-                        final String attribute = tokenizer.nextToken().toLowerCase(Locale.ROOT);
-                        // Second word of the line (must be an integer)
-                        final int value = Integer.parseInt(tokenizer.nextToken());
-
-                        switch (attribute) {
-                            case MIN -> confBuilder.setMin(value);
-                            case MAX -> confBuilder.setMax(value);
-                            case ATTEMPTS -> confBuilder.setAttempts(value);
-                            default -> DrawNumberApp.displayErrorAll(
-                                    "Configuration file format error: invalid attribute (line " + lineNumber + ")",
-                                    views);
-                        }
-                    } else {
-                        DrawNumberApp
-                                .displayErrorAll(
-                                        "Configuration file format error: each line must contain exactly two words (line "
-                                                + lineNumber + ")",
-                                        views);
-                    }
+                    readLine(lineNumber, line, views);
                     lineNumber++;
                 }
             }
-        } catch (final IOException e) {
-            DrawNumberApp.displayErrorAll("Cannot read the file '" + FILE_NAME + "'. " + DEFAULTVALUES_ERROR,
-                    views);
+        } catch (final IOException e) { // File cannot be read
+            DrawNumberApp.displayErrorAll(String.format(FILE_READ_ERROR, FILE_NAME) + " " + DEFAULT_VALUES_SET, views);
         } catch (final NumberFormatException e) {
             DrawNumberApp.displayErrorAll(
-                    "Invalid configuration file format. " + e.getMessage() + " (line " + lineNumber + "). "
-                            + DEFAULTVALUES_ERROR,
+                    String.format(FILE_FORMAT_ERROR, e.getMessage(), lineNumber) + " " + DEFAULT_VALUES_SET, views);
+        } catch (final URISyntaxException e) { // Error while reading the file path
+            DrawNumberApp.displayErrorAll(String.format(FILE_PATH_ERROR, e.getMessage()) + " " + DEFAULT_VALUES_SET,
                     views);
-        } catch (final URISyntaxException e) {
+        }
+    }
+
+    /**
+     * Reads the attribute of the given line and sets the corrisponding value
+     * 
+     * @param lineNumber number of current line
+     * @param line       line of the file to read
+     * @param views      views to attach
+     * 
+     * @throws NumberFormatException if the value field does not contain a number
+     */
+    private void readLine(int lineNumber, final String line, final DrawNumberView... views)
+            throws NumberFormatException {
+        // Splits the lines into tokens (words separated by a colon and a space by
+        // default)
+        final var tokenizer = new StringTokenizer(line, ": ");
+
+        // Each line of the file must have the format 'attribute: value' (colon and
+        // space between the two are needed)
+        if (tokenizer.countTokens() == 2) {
+            // First word of the line; ignoring case
+            final String attribute = tokenizer.nextToken().toLowerCase(Locale.ROOT);
+            // Second word of the line (must be an integer)
+            final int value = Integer.parseInt(tokenizer.nextToken());
+
+            switch (attribute) {
+                case MIN -> confBuilder.setMin(value);
+                case MAX -> confBuilder.setMax(value);
+                case ATTEMPTS -> confBuilder.setAttempts(value);
+                default -> DrawNumberApp.displayErrorAll(
+                        String.format(FILE_FORMAT_ERROR, "invalid attribute", lineNumber), views);
+            }
+        } else {
             DrawNumberApp.displayErrorAll(
-                    "Cannot read the file path. " + e.getMessage() + ". " + DEFAULTVALUES_ERROR,
-                    views);
+                    String.format(FILE_FORMAT_ERROR, "each line must contain exactly two words", lineNumber), views);
         }
     }
 
