@@ -28,11 +28,11 @@ public final class ConfigFromFile {
      */
     public ConfigFromFile(final DrawNumberView... views) {
         confBuilder = new Configuration.Builder();
+        int lineNumber = 1; // Used by the error log
+
         try {
             // Searches for the specified file in the class path and gets its URL
             final var fileURL = ClassLoader.getSystemResource(FILE_NAME);
-
-            int lineNumber = 1; // Used by the error log
 
             if (Objects.isNull(fileURL)) {
                 DrawNumberApp.displayErrorAll("Cannot find the file '" + FILE_NAME + "'. " + DEFAULTVALUES_ERROR,
@@ -69,20 +69,18 @@ public final class ConfigFromFile {
                                                 + lineNumber + ")",
                                         views);
                     }
-
                     lineNumber++;
                 }
             }
         } catch (final IOException e) {
-            e.printStackTrace();
             DrawNumberApp.displayErrorAll("Cannot read the file '" + FILE_NAME + "'. " + DEFAULTVALUES_ERROR,
                     views);
         } catch (final NumberFormatException e) {
-            e.printStackTrace();
             DrawNumberApp.displayErrorAll(
-                    "Invalid configuration file format. " + e.getMessage() + ". " + DEFAULTVALUES_ERROR, views);
+                    "Invalid configuration file format. " + e.getMessage() + " (line " + lineNumber + "). "
+                            + DEFAULTVALUES_ERROR,
+                    views);
         } catch (final URISyntaxException e) {
-            e.printStackTrace();
             DrawNumberApp.displayErrorAll(
                     "Cannot read the file path. " + e.getMessage() + ". " + DEFAULTVALUES_ERROR,
                     views);
