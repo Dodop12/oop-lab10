@@ -44,8 +44,8 @@ public final class ConfigFromFile {
                         views);
             } else {
                 final Path filePath = Path.of(fileURL.toURI());
-                final List<String> lines = Files.readAllLines(filePath, StandardCharsets.UTF_8);
 
+                final List<String> lines = Files.readAllLines(filePath, StandardCharsets.UTF_8);
                 for (final String line : lines) {
                     readLine(lineNumber, line, views);
                     lineNumber++;
