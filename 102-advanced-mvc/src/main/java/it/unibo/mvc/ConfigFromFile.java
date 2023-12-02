@@ -56,6 +56,12 @@ public final class ConfigFromFile {
 
     /**
      * Reads the given file to extract the values.
+     * Each line of the file must have the following format: 'attribute: value'.
+     * If there are multiple lines containing the same attribute with a correct
+     * format, the value of the bottom-most line will overwrite those above it.
+     * In case of any error occurred while reading the file or any format error will
+     * cause the program to set the default values specified in
+     * {@link it.unibo.mvc.Configuration.Builder}.
      * 
      * @param fileURL the URL of the file to read
      * @param views   the graphical interfaces of the app
@@ -76,19 +82,17 @@ public final class ConfigFromFile {
 
     /**
      * Reads the attribute of the specified line of the file and sets the
-     * corresponding value.
+     * corresponding value if the format is correct. Otherwise, it displays a
+     * specific error on the views.
      * 
      * @param line  the line of the file to read
      * @param views the graphical interfaces of the app
      * @throws NumberFormatException if the value field does not contain a number
      */
     private void readLine(final String line, final DrawNumberView... views) {
-        // Splits the lines into tokens (words separated by a colon and a space by
-        // default)
+        // Splits the line into tokens
         final var tokenizer = new StringTokenizer(line, ": ");
 
-        // Each line of the file must have the format 'attribute: value' (colon and
-        // space between the two are needed)
         if (tokenizer.countTokens() == 2) {
             // First word of the line; ignoring case
             final String attribute = tokenizer.nextToken().toLowerCase(Locale.ROOT);
