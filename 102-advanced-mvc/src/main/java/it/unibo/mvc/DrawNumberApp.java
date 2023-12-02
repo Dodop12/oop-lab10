@@ -62,7 +62,12 @@ public final class DrawNumberApp implements DrawNumberViewObserver {
          * should be paid to alive threads, as the application would continue to persist
          * until the last thread terminates.
          */
-        System.exit(0);
+        // System.exit(0);
+
+        // Using the Jframe.dispose() method is a cleaner way to execute the termination
+        for (final DrawNumberView view : views) {
+            view.stop();
+        }
     }
 
     /**

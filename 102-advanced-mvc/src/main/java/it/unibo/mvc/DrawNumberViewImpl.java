@@ -79,6 +79,11 @@ public final class DrawNumberViewImpl implements DrawNumberView {
         this.frame.setVisible(true);
     }
 
+    @Override
+    public void stop() {
+        this.frame.dispose();
+    }
+
     private boolean confirmDialog(final String question, final String name) {
         return JOptionPane.showConfirmDialog(frame, question, name,
                 JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;

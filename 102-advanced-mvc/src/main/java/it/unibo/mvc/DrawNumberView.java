@@ -17,6 +17,11 @@ public interface DrawNumberView {
     void start();
 
     /**
+     * Clears and closes the view.
+     */
+    void stop();
+
+    /**
      * Informs the user that the inserted number is not correct.
      */
     void numberIncorrect();
