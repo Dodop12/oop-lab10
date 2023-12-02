@@ -89,7 +89,7 @@ public final class LambdaUtilities {
          * Suggestion: consider Map.merge
          */
         final Map<R, Set<T>> map = new LinkedHashMap<>();
-        list.forEach(t -> map.merge(op.apply(t), Set.of(t), LambdaUtilities::union)); //
+        list.forEach(t -> map.merge(op.apply(t), Set.of(t), LambdaUtilities::union));
         return map;
     }
 
