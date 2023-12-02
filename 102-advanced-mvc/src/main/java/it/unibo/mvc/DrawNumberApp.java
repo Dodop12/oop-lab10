@@ -1,6 +1,7 @@
 package it.unibo.mvc;
 
 import java.io.FileNotFoundException;
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -85,10 +86,12 @@ public final class DrawNumberApp implements DrawNumberViewObserver {
     /**
      * @param args
      *             ignored
-     * @throws FileNotFoundException if the specified file cannot be neither opened
-     *                               nor created
+     * @throws FileNotFoundException        if the specified file cannot be neither
+     *                                      opened
+     *                                      nor created
+     * @throws UnsupportedEncodingException
      */
-    public static void main(final String... args) throws FileNotFoundException {
+    public static void main(final String... args) throws FileNotFoundException, UnsupportedEncodingException {
         // Launches the app attaching two graphical views, a file log and the console
         // view (standard output)
         new DrawNumberApp(new DrawNumberViewImpl(), new DrawNumberViewImpl(), new PrintStreamView("log.txt"),
