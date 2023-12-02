@@ -3,10 +3,11 @@
  */
 package it.unibo.mvc;
 
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * This class implements a view that can write on any PrintStream.
@@ -20,6 +21,7 @@ public final class PrintStreamView implements DrawNumberView {
      *
      * @param stream the {@link PrintStream} where to write
      */
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Storing an externally mutable object is done on purpose")
     public PrintStreamView(final PrintStream stream) {
         out = stream;
     }
@@ -28,10 +30,12 @@ public final class PrintStreamView implements DrawNumberView {
      * Builds a {@link PrintStreamView} that writes on file, given a path.
      * 
      * @param path a file path
-     * @throws FileNotFoundException if the file cannot be created
+     * @throws FileNotFoundException        if the file cannot be created
+     * @throws UnsupportedEncodingException if the specified charset is not
+     *                                      supported
      */
-    public PrintStreamView(final String path) throws FileNotFoundException {
-        out = new PrintStream(new FileOutputStream(new File(path)));
+    public PrintStreamView(final String path) throws FileNotFoundException, UnsupportedEncodingException {
+        out = new PrintStream(path, "UTF-8");
     }
 
     @Override
